@@ -1,12 +1,7 @@
-//I ran into an error for some reason on one of the data points
-//(the data was probably incomplete), so I used this to bypass the
-//error later in the code.
-function stoperror() {
-    return true;
- }
+
 
  //Getting Data
-jQuery.getJSON("../samples.json", function(json) {
+jQuery.getJSON("samples.json", function(json) {
     var data = json
     var ref_number = 0
     // Grab values from the response json object to build the plots
@@ -23,7 +18,7 @@ jQuery.getJSON("../samples.json", function(json) {
     var wfreqs = []
 
     
-
+//Calls my data and puts it into empty arrays
 
     for (i = 0; i < data.samples.length; i++) { 
         sample_values.push(data.samples[i].sample_values);
@@ -31,25 +26,6 @@ jQuery.getJSON("../samples.json", function(json) {
         otu_ids.push(data.samples[i].otu_ids)
     }
 
-        // if (data.samples[i].otu_ids.length > 0) {
-        //     try{
-
-            
-            // otu_id = [];
-
-        // for (j = 0; j <data.samples[i].otu_ids.length; i++) {
-        //         otu_id.push(`${data.samples[i].otu_ids[j]}`);
-        // }
-        //     otu_ids.push(otu_id)
-
-        //     } catch(e){
-        //         console.log(e)
-        //     stoperror(e);
-        //     }
-
-        // }
-        // else {}
-        // }
     for (i = 0; i < data.metadata.length; i++) { 
                 ids.push(data.metadata[i].id);
         ethnicities.push(data.metadata[i].ethnicity);
@@ -62,7 +38,7 @@ jQuery.getJSON("../samples.json", function(json) {
     }
     
   
-    //Demographic Data
+    //Demographic Data - Makes the chart
     function make_dems(number) {
         d3.select("#sample-metadata").text('')
         d3.select("#sample-metadata").append("p").text(`ID: ${ids[number]}`);
@@ -92,11 +68,8 @@ jQuery.getJSON("../samples.json", function(json) {
       }
 
     };
-        
 
         data = [trace1]
-       
-
 
         var layout = {
             title: `Most Common Biodiversity in Patient ${namez[number]}`,
@@ -139,7 +112,6 @@ d3.select("select").append("option").text(namez[i])
 }
 
 
-var selected = d3.select("option")
 
 var inputElement = d3.select("#selDataset");
 var inputValue = inputElement.property("value");
@@ -147,41 +119,11 @@ var inputValue = inputElement.property("value");
 
 var button = d3.select("#selDataset");
 
-button.on("change", function() {
-
-console.log('click')
 
 
-function optionChanged(){
-    inputElement = d3.select("#selDataset");
-    inputValue = inputElement.property("value");
-    console.log(inputValue)
-    for (i = 0; i < namez.length; i++) {
 
-        if (inputValue === namez[i]) {
-            ref_number = i
-            console.log(ref_number)
-            console.log(otu_ids)
-            make_dems(ref_number)
-            makebar(ref_number)
-            make_bubble(ref_number)
-            
-                }
-                
-        else {}
-            
-        
 
-    
-}}
-optionChanged()
-}
-);
-// function optionChanged() {
-//     selected.on('click', function() {
 
-//     
-// }
 
 console.log(otu_ids)
 
@@ -218,7 +160,7 @@ function make_bubble(number) {
         title:  `Most Common Biodiversity in Patient ${namez[number]}`,
         showlegend: false,
         height: 600,
-        width: 1500,
+        width: 1200,
         range: [-500, 3500]
 
     
@@ -230,7 +172,73 @@ function make_bubble(number) {
 
 make_bubble(ref_number)
 
+
+
+//Makes Gauge Chart
+function make_gauge(number) {
+
+    var data = [
+        {
+          domain: { x: [0, 1], y: [0, 1] },
+          value: wfreqs[number],
+          title: { text: `Scrubs Per Week for Patient ${namez[number]}` },
+          type: "indicator",
+          mode: "gauge+number",
+          delta: { reference: 380 },
+          gauge: {
+            axis: { range: [null, 10] },
+            steps: [
+              { range: [0, 2], color: "rgba(255, 0, 0, 0.6)" },
+              { range: [2, 4], color: "rgba(255, 165, 0, 0.6)" },
+              { range: [4, 6], color: "rgba(255, 255, 0, 0.6)" },
+              { range: [6, 8], color: "rgba(144, 238, 144, 0.6)" },
+              { range: [8, 10], color: "rgba(154, 205, 50, 0.6)" }
+            ],
+           
+        
+            
+          }
+        }
+      ];
+      
+      var layout = { width: 600, height: 450, margin: { t: 0, b: 0 } };
+      Plotly.newPlot('gauge', data, layout);
+}
+make_gauge(ref_number)
+
+
+//Updates all of the charts.
+
+button.on("change", function() {
+
+    console.log('click')
+function optionChanged(){
+    inputElement = d3.select("#selDataset");
+    inputValue = inputElement.property("value");
+    console.log(inputValue)
+    for (i = 0; i < namez.length; i++) {
+
+        if (inputValue === namez[i]) {
+            ref_number = i
+            console.log(ref_number)
+            console.log(otu_ids)
+            make_dems(ref_number)
+            makebar(ref_number)
+            make_gauge(ref_number)
+            make_bubble(ref_number)
+            
+                }
+                
+        else {}
+            
+    
+}}
+optionChanged()
+}
+);
 });
+
+
 
 
 
